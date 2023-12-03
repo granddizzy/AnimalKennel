@@ -1,3 +1,6 @@
+import abstractAnimals.Animal;
+
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class View {
@@ -16,11 +19,39 @@ public class View {
         System.out.println("2.Удалить умение (команду)");
     }
 
+    public void showAnimalTypes() {
+        System.out.println("Виды животных:");
+        System.out.println("1.Кошка:");
+        System.out.println("2.Собака");
+        System.out.println("3.Хомяк");
+        System.out.println("4.Лошадь");
+        System.out.println("5.Осел");
+        System.out.println("6.Верблюд");
+    }
+
     public String inputParameter(String query) {
-        System.out.print(query);
+        System.out.print(query + ": ");
         Scanner scanner = new Scanner(System.in);
         String str = scanner.nextLine();
         System.out.println();
         return str;
+    }
+
+    public void showAnimalList(ArrayList<Animal> animals) {
+        if (animals.size() == 0) {
+            System.out.println("В приюте нет ни одного животного.");
+        } else {
+            System.out.println("Список животных в приюте:");
+            for (Animal animal: animals) {
+                System.out.println(animal);
+            }
+            System.out.println();
+        }
+    }
+
+    public int selectAnimalType() {
+        int type = 0;
+
+        return type;
     }
 }

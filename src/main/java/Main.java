@@ -2,8 +2,13 @@ public class Main {
     public static void main(String[] args) {
         Log log = new Log();
         View view = new View();
-        Kennel kennel = new Kennel(view, log);
+        Database db = new Database();
 
-        kennel.start();
+        if (db.getInitOk()) {
+            Kennel kennel = new Kennel(view, log, db);
+            kennel.start();
+        } else {
+            System.out.println("Ошибка инициализации базы данных!");
+        }
     }
 }
