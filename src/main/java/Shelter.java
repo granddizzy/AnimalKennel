@@ -3,12 +3,12 @@ import animals.*;
 
 import java.util.ArrayList;
 
-public class Kennel {
+public class Shelter {
     private View view;
     private Log log;
     private Database db;
 
-    public Kennel(View view, Log log, Database db) {
+    public Shelter(View view, Log log, Database db) {
         this.log = log;
         this.view = view;
         this.db = db;

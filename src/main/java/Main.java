@@ -5,8 +5,8 @@ public class Main {
         Database db = new Database();
 
         if (db.getInitOk()) {
-            Kennel kennel = new Kennel(view, log, db);
-            kennel.start();
+            Shelter shelter = new Shelter(view, log, db);
+            shelter.start();
         } else {
             System.out.println("Ошибка инициализации базы данных!");
         }
