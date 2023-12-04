@@ -51,21 +51,30 @@ public class Kennel {
                 case "4":
                     view.showAnimalList(db.getAnimalsList());
                     String curr_id = view.inputParameter("Введите ID животного для просмотра данных");
-                    Animal currentAnimal = db.getAnimal(Integer.parseInt(curr_id));
+
+                    Animal currentAnimal = null;
+
+                    try {
+                        currentAnimal = db.getAnimal(Integer.parseInt(curr_id));
+                    } catch (Exception ignored) {
+
+                    }
 
                     if (currentAnimal != null) {
                         String choice2 = "";
-                        while (!choice.equals("")) {
+                        while (!choice2.equals("0")) {
                             view.showAnimalParams(currentAnimal);
                             view.showAnimalMenu();
                             choice2 = view.inputParameter("Выберите пункт меню");
 
                             switch (choice2) {
                                 case "1":
-                                    System.out.println(1);
+                                    String skill = view.inputParameter("Введите новое умение");
+                                    currentAnimal.addAnimalSkill(skill);
+                                    db.updateAnimal(currentAnimal);
                                     break;
                                 case "2":
-                                    System.out.println(2);
+                                    System.out.println("В разработке");
                                     break;
                             }
                         }
@@ -97,7 +106,7 @@ public class Kennel {
             case "Camel" -> {
                 animal = new Camel(name, birthday, birthmonth, birthyear);
             }
-            case "Hourse" -> {
+            case "Horse" -> {
                 animal = new Horse(name, birthday, birthmonth, birthyear);
             }
             case "Donkey" -> {

@@ -82,5 +82,20 @@ public class View {
         System.out.println("Параметры: ");
         System.out.println(animal);
         System.out.println();
+        showSkills(animal);
+    }
+
+    void showSkills(Animal animal) {
+        if (animal.getSkills().size() == 0) {
+            System.out.println("Навыков еще нет.");
+        } else {
+            System.out.println("Навыки:");
+            int i = 1;
+            for (String skill : animal.getSkills()) {
+                System.out.println("" + i + "." + skill);
+                i++;
+            }
+        }
+        System.out.println();
     }
 }

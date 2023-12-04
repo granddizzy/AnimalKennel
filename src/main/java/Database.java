@@ -3,6 +3,7 @@ import animals.*;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Database implements DatabaseInterface {
 
@@ -72,7 +73,7 @@ public class Database implements DatabaseInterface {
             BufferedReader reader = new BufferedReader(new FileReader(file));
             String line;
             while ((line = reader.readLine()) != null) {
-                String[] arrLine = line.replace("\n", "").split(";");
+                String[] arrLine = line.replace("\n", "").split(";", -1);
                 if (Integer.parseInt(arrLine[0]) == id) {
                     return createAnimal(arrLine);
                 }
@@ -88,7 +89,30 @@ public class Database implements DatabaseInterface {
 
     @Override
     public void updateAnimal(Animal animal) {
+        try {
+            File file = new File(DBFilePath);
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            StringBuilder sb = new StringBuilder();
+            String line;
 
+            while ((line = reader.readLine()) != null) {
+                String[] arrLine = line.split(";");
+                if (Integer.parseInt(arrLine[0]) != animal.getId()) {
+                    sb.append(line);
+                    sb.append(System.lineSeparator());
+                } else {
+                    sb.append(createDBLine(animal));
+                }
+            }
+            reader.close();
+
+            FileOutputStream fileOut = new FileOutputStream(file);
+            fileOut.write(sb.toString().getBytes());
+            fileOut.close();
+        } catch (IOException e) {
+            System.out.println("Ошибка при чтении или записи файла.");
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -151,8 +175,7 @@ public class Database implements DatabaseInterface {
     }
 
     private String[] parseDatabaseLine(String line) {
-        return line.split(";");
-
+        return line.split(";", -1);
     }
 
     private Animal createAnimal(String[] animalArray) {
@@ -163,6 +186,11 @@ public class Database implements DatabaseInterface {
         int birthyear = 0;
 
         ArrayList<String> skills = new ArrayList<>();
+
+        if (!animalArray[4].equals("")) {
+            String[] arrSkills = animalArray[4].split("\\|", -1);
+            skills = new ArrayList<>(Arrays.asList(arrSkills));
+        }
 
         switch (animalArray[1]) {
             case "Dog" -> {
@@ -177,7 +205,7 @@ public class Database implements DatabaseInterface {
             case "Camel" -> {
                 animal = new Camel(Integer.parseInt(animalArray[0]), animalArray[2], birthday, birthmonth, birthyear, skills);
             }
-            case "Hourse" -> {
+            case "Horse" -> {
                 animal = new Horse(Integer.parseInt(animalArray[0]), animalArray[2], birthday, birthmonth, birthyear, skills);
             }
             case "Donkey" -> {
@@ -213,7 +241,15 @@ public class Database implements DatabaseInterface {
         sb.append(animal.getName()).append(";");
 
         // date birthday
-        sb.append(animal.getBirthyear()).append(".").append(animal.getBirthmonth()).append(".").append(animal.getBirthday()).append("\n");
+        sb.append(animal.getBirthyear()).append(".").append(animal.getBirthmonth()).append(".").append(animal.getBirthday()).append(";");
+
+        for (String skill : animal.getSkills()) {
+            sb.append(skill).append("|");
+        }
+
+        sb.delete(sb.length() - 1, sb.length());
+
+        sb.append("\n");
 
         return sb.toString();
     }
