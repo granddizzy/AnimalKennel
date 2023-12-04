@@ -15,6 +15,6 @@ public class Dog extends HomeAnimal {
 
     @Override
     public String toString() {
-        return "id:" + super.getId() + " Собака: " + super.getName() + " Дата рождения: "  + this.getBirthday() + "." + this.getBirthmonth() + "." + this.getBirthyear();
+        return "id:" + super.getId() + " Собака: " + super.getName() + " Дата рождения: " + this.getBirthday() + "." + this.getBirthmonth() + "." + this.getBirthyear();
     }
 }

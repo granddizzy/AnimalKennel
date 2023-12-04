@@ -74,7 +74,16 @@ public class Shelter {
                                     db.updateAnimal(currentAnimal);
                                     break;
                                 case "2":
-                                    System.out.println("В разработке");
+                                    view.showAnimalParams(currentAnimal);
+                                    String id_skill = view.inputParameter("Введите ID умения для удаления");
+                                    try {
+                                        currentAnimal.delAnimalSkill(Integer.parseInt(id_skill) - 1);
+                                        db.updateAnimal(currentAnimal);
+                                        view.showMessage("Умение было удалено.");
+                                    } catch (Exception ignored) {
+
+                                    }
+
                                     break;
                             }
                         }
