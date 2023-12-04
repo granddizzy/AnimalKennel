@@ -28,6 +28,10 @@ public class Database implements DatabaseInterface {
 
     @Override
     public void addAnimal(Animal animal) {
+        int lastId = getLastID();
+        lastId++;
+        animal.setId(lastId);
+
         try (FileWriter fw = new FileWriter(DBFilePath, true)) {
             fw.write(createDBLine(animal));
         } catch (IOException ignored) {
@@ -36,8 +40,50 @@ public class Database implements DatabaseInterface {
     }
 
     @Override
-    public void delAnimal(Animal animal) {
+    public void delAnimal(int id) {
+        try {
+            File file = new File(DBFilePath);
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            StringBuilder sb = new StringBuilder();
+            String line;
 
+            while ((line = reader.readLine()) != null) {
+                String[] arrLine = line.split(";");
+                if (Integer.parseInt(arrLine[0]) != id) {
+                    sb.append(line);
+                    sb.append(System.lineSeparator());
+                }
+            }
+            reader.close();
+
+            FileOutputStream fileOut = new FileOutputStream(file);
+            fileOut.write(sb.toString().getBytes());
+            fileOut.close();
+        } catch (IOException e) {
+            System.out.println("Ошибка при чтении или записи файла.");
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public Animal getAnimal(int id) {
+        try {
+            File file = new File(DBFilePath);
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] arrLine = line.replace("\n", "").split(";");
+                if (Integer.parseInt(arrLine[0]) == id) {
+                    return createAnimal(arrLine);
+                }
+            }
+            reader.close();
+        } catch (IOException e) {
+            System.out.println("Ошибка при чтении или записи файла.");
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     @Override
@@ -67,9 +113,25 @@ public class Database implements DatabaseInterface {
         return animalList;
     }
 
-    @Override
     public Integer getLastID() {
-        return null;
+        String result = null;
+        try (RandomAccessFile file = new RandomAccessFile(DBFilePath, "r")) {
+            long pointer = file.length();
+
+            while (result == null || result.length() == 0) {
+                file.seek(pointer--);
+                file.readLine();
+                result = file.readLine();
+            }
+        } catch (IOException e) {
+            System.out.println("Ошибка при чтении файла.");
+            e.printStackTrace();
+        }
+
+
+        if (result != null) return Integer.parseInt(result.split(";")[0]);
+
+        return 0;
     }
 
     @Override

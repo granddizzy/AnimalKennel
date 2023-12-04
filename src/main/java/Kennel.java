@@ -1,23 +1,17 @@
 import abstractAnimals.Animal;
 import animals.*;
 
-import java.security.interfaces.DSAKey;
 import java.util.ArrayList;
 
 public class Kennel {
-    private int lastAnimalId = 0;
     private View view;
     private Log log;
-
     private Database db;
-
-    private ArrayList<Animal> animals;
 
     public Kennel(View view, Log log, Database db) {
         this.log = log;
         this.view = view;
         this.db = db;
-        this.animals = new ArrayList<>();
     }
 
     public void start() {
@@ -42,28 +36,25 @@ public class Kennel {
                     db.addAnimal(animal);
                     break;
                 case "3":
+                    view.showAnimalList(db.getAnimalsList());
+                    String id = view.inputParameter("Введите ID животного для удаления");
+                    Animal delAnimal = db.getAnimal(Integer.parseInt(id));
+                    db.delAnimal(Integer.parseInt(id));
+                    view.showAnimalList(db.getAnimalsList());
+                    view.showMessage("Удалено животное - " + delAnimal.toString());
                     break;
                 case "4":
+                    view.showAnimalList(db.getAnimalsList());
+                    String curr_id = view.inputParameter("Введите ID животного для просмотра данных");
+                    Animal currentAnimal = db.getAnimal(Integer.parseInt(curr_id));
+                    view.showAnimalParams(currentAnimal);
                     break;
             }
         }
     }
 
-    public int getNewAnimalId() {
-        lastAnimalId = lastAnimalId + 1;
-        return lastAnimalId;
-    }
-
     public ArrayList<Animal> getAnimals() {
         return db.getAnimalsList();
-    }
-
-    public void addAnimalSkill() {
-
-    }
-
-    public void delAnimalSkill() {
-
     }
 
     private Animal createNewAnimal(String type, String name, int birthyear, int birthmonth, int birthday) {

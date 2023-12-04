@@ -5,13 +5,13 @@ import java.util.ArrayList;
 public interface DatabaseInterface {
     void addAnimal(Animal animal);
 
-    void delAnimal(Animal animal);
+    void delAnimal(int id);
+
+    Animal getAnimal(int id);
 
     void updateAnimal(Animal animal);
 
     ArrayList<Animal> getAnimalsList();
-
-    Integer getLastID();
 
     boolean getInitOk();
 }

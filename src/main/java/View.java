@@ -19,6 +19,11 @@ public class View {
         System.out.println("2.Удалить умение (команду)");
     }
 
+    public void showMessage(String msg){
+        System.out.println(msg);
+        System.out.println();
+    }
+
     public void showAnimalTypes() {
         System.out.println("Виды животных:");
         System.out.println("1.Кошка:");
@@ -53,5 +58,11 @@ public class View {
         int type = 0;
 
         return type;
+    }
+
+    void showAnimalParams(Animal animal) {
+        System.out.println("Параметры: ");
+        System.out.println(animal);
+        System.out.println();
     }
 }

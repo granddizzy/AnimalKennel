@@ -49,6 +49,10 @@ public abstract class Animal implements AnimalInterface {
         return id;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public int getBirthday() {
         return birthday;
     }
