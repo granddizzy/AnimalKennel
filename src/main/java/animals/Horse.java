@@ -13,4 +13,9 @@ public class Horse extends PackAnimal {
     public Horse(int id, String name, int birthday, int birthmonth, int birthyear, ArrayList<String> skills) {
         super(id, name, birthday, birthmonth, birthyear, skills);
     }
+
+    @Override
+    public String toString() {
+        return "id:" + super.getId() + " Лошадь: " + super.getName() + " Дата рождения: "  + this.getBirthday() + "." + this.getBirthmonth() + "." + this.getBirthyear();
+    }
 }

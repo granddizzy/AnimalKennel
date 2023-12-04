@@ -25,7 +25,7 @@ public class Kennel {
                     view.showAnimalList(db.getAnimalsList());
                     break;
                 case "2":
-                    String type = view.inputParameter("Введите тип животного");
+                    String type = view.selectAnimalType();
                     String name = view.inputParameter("Введите имя животного");
                     String birthyear = view.inputParameter("Введите год рождения животного");
                     String birthmonth = view.inputParameter("Введите месяц рождения животного");
@@ -34,20 +34,44 @@ public class Kennel {
                     Animal animal = createNewAnimal(type, name, Integer.parseInt(birthyear), Integer.parseInt(birthmonth), Integer.parseInt(birthday));
 
                     db.addAnimal(animal);
+                    view.showAnimalList(db.getAnimalsList());
                     break;
                 case "3":
                     view.showAnimalList(db.getAnimalsList());
                     String id = view.inputParameter("Введите ID животного для удаления");
                     Animal delAnimal = db.getAnimal(Integer.parseInt(id));
-                    db.delAnimal(Integer.parseInt(id));
-                    view.showAnimalList(db.getAnimalsList());
-                    view.showMessage("Удалено животное - " + delAnimal.toString());
+                    if (delAnimal != null) {
+                        db.delAnimal(Integer.parseInt(id));
+                        view.showAnimalList(db.getAnimalsList());
+                        view.showMessage("Удалено животное - " + delAnimal.toString());
+                    } else {
+                        view.showMessage("Не найдено животное с ID:" + id);
+                    }
                     break;
                 case "4":
                     view.showAnimalList(db.getAnimalsList());
                     String curr_id = view.inputParameter("Введите ID животного для просмотра данных");
                     Animal currentAnimal = db.getAnimal(Integer.parseInt(curr_id));
-                    view.showAnimalParams(currentAnimal);
+
+                    if (currentAnimal != null) {
+                        String choice2 = "";
+                        while (!choice.equals("")) {
+                            view.showAnimalParams(currentAnimal);
+                            view.showAnimalMenu();
+                            choice2 = view.inputParameter("Выберите пункт меню");
+
+                            switch (choice2) {
+                                case "1":
+                                    System.out.println(1);
+                                    break;
+                                case "2":
+                                    System.out.println(2);
+                                    break;
+                            }
+                        }
+                    } else {
+                        view.showMessage("Не найдено животное с ID:" + curr_id);
+                    }
                     break;
             }
         }

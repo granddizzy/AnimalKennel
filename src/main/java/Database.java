@@ -115,19 +115,30 @@ public class Database implements DatabaseInterface {
 
     public Integer getLastID() {
         String result = null;
-        try (RandomAccessFile file = new RandomAccessFile(DBFilePath, "r")) {
-            long pointer = file.length();
 
-            while (result == null || result.length() == 0) {
-                file.seek(pointer--);
-                file.readLine();
-                result = file.readLine();
+        try (RandomAccessFile file = new RandomAccessFile(DBFilePath, "r")) {
+            long fileLength = file.length();
+
+            StringBuilder lastLine = new StringBuilder();
+            long pointer = fileLength - 1;
+
+            while (pointer >= 0) {
+                file.seek(pointer);
+                char currentChar = (char) file.readByte();
+
+                if (currentChar == '\n' && lastLine.length() > 0) {
+                    break;
+                }
+
+                lastLine.insert(0, currentChar);
+                pointer--;
             }
+
+            result = lastLine.toString().replace("\n", "");
         } catch (IOException e) {
             System.out.println("Ошибка при чтении файла.");
             e.printStackTrace();
         }
-
 
         if (result != null) return Integer.parseInt(result.split(";")[0]);
 
