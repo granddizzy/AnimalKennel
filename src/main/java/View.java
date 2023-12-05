@@ -3,6 +3,8 @@ import abstractAnimals.Animal;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import java.time.Year;
+
 public class View {
     public void showMainMenu() {
         System.out.println("Главное меню:");
@@ -35,12 +37,83 @@ public class View {
         System.out.println("6.Верблюд");
     }
 
-    public String inputParameter(String query) {
+    public String inputString(String query) {
         System.out.print(query + ": ");
         Scanner scanner = new Scanner(System.in);
         String str = scanner.nextLine();
         System.out.println();
         return str;
+    }
+
+    public int inputYear(String query) {
+        int year = 2000;
+        int currentYear = Year.now().getValue();
+
+        boolean flag = true;
+        while (flag) {
+            flag = false;
+            year = inputNumber(query);
+
+            if (year > currentYear) {
+                showMessage("Год больше текущего!");
+                flag = true;
+            }
+
+            if (currentYear - year > 100) {
+                showMessage("К сожалению столько не живут!");
+                flag = true;
+            }
+        }
+
+        return year;
+    }
+
+    public int inputMonth(String query) {
+        int month = 1;
+        boolean flag = true;
+        while (flag) {
+            flag = false;
+            month = inputNumber(query);
+
+            if (month < 1 || month > 12) {
+                showMessage("Месяц должен быть 1 - 12");
+                flag = true;
+            }
+        }
+
+        return month;
+    }
+
+    public int inputDay(String query) {
+        int day = 1;
+        boolean flag = true;
+        while (flag) {
+            flag = false;
+            day = inputNumber(query);
+
+            if (day < 1 || day > 31) {
+                showMessage("День должен быть 1 - 31");
+                flag = true;
+            }
+        }
+
+        return day;
+    }
+
+    public int inputNumber(String query) {
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+            System.out.print(query + ": ");
+            String str = scanner.nextLine();
+            System.out.println();
+
+            try {
+                return Integer.parseInt(str);
+            } catch (NumberFormatException ignored) {
+
+            }
+        }
     }
 
     public void showAnimalList(ArrayList<Animal> animals) {
@@ -59,7 +132,7 @@ public class View {
         String choice = "";
         while (true) {
             showAnimalTypes();
-            choice = inputParameter("Выберите тип животного" +
+            choice = inputString("Выберите тип животного" +
                     "");
             switch (choice) {
                 case "1":

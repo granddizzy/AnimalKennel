@@ -1,12 +1,13 @@
 import abstractAnimals.Animal;
 import animals.*;
+import logs.Log;
 
 import java.util.ArrayList;
 
 public class Shelter {
-    private View view;
+    private final View view;
     private Log log;
-    private Database db;
+    private final Database db;
 
     public Shelter(View view, Log log, Database db) {
         this.log = log;
@@ -15,74 +16,70 @@ public class Shelter {
     }
 
     public void start() {
-        String choice = "";
-        while (!choice.equals("0")) {
+        if (log.getInitOk()) {
+            log.clear();
+        }
+
+        int choice = -1;
+        while (choice != 0) {
             view.showMainMenu();
-            choice = view.inputParameter("Выберите пункт меню");
+            choice = view.inputNumber("Выберите пункт меню");
 
             switch (choice) {
-                case "1":
+                case 1:
                     view.showAnimalList(db.getAnimalsList());
                     break;
-                case "2":
+                case 2:
                     String type = view.selectAnimalType();
-                    String name = view.inputParameter("Введите имя животного");
-                    String birthyear = view.inputParameter("Введите год рождения животного");
-                    String birthmonth = view.inputParameter("Введите месяц рождения животного");
-                    String birthday = view.inputParameter("Введите день рождения животного");
+                    String name = view.inputString("Введите имя животного");
+                    int birthyear = view.inputYear("Введите год рождения животного");
+                    int birthmonth = view.inputMonth("Введите месяц рождения животного");
+                    int birthday = view.inputDay("Введите день рождения животного");
 
-                    Animal animal = createNewAnimal(type, name, Integer.parseInt(birthyear), Integer.parseInt(birthmonth), Integer.parseInt(birthday));
-
+                    Animal animal = createNewAnimal(type, name, birthyear, birthmonth, birthday);
                     db.addAnimal(animal);
                     view.showAnimalList(db.getAnimalsList());
                     break;
-                case "3":
+                case 3:
                     view.showAnimalList(db.getAnimalsList());
-                    String id = view.inputParameter("Введите ID животного для удаления");
-                    Animal delAnimal = db.getAnimal(Integer.parseInt(id));
+                    int id = view.inputNumber("Введите ID животного для удаления");
+
+                    Animal delAnimal = db.getAnimal(id);
                     if (delAnimal != null) {
-                        db.delAnimal(Integer.parseInt(id));
+                        db.delAnimal(id);
+                        view.showMessage("Удалено животное - " + delAnimal);
                         view.showAnimalList(db.getAnimalsList());
-                        view.showMessage("Удалено животное - " + delAnimal.toString());
                     } else {
                         view.showMessage("Не найдено животное с ID:" + id);
                     }
+
                     break;
-                case "4":
+                case 4:
                     view.showAnimalList(db.getAnimalsList());
-                    String curr_id = view.inputParameter("Введите ID животного для просмотра данных");
+                    int curr_id = view.inputNumber("Введите ID животного для просмотра данных");
 
-                    Animal currentAnimal = null;
-
-                    try {
-                        currentAnimal = db.getAnimal(Integer.parseInt(curr_id));
-                    } catch (Exception ignored) {
-
-                    }
+                    Animal currentAnimal = db.getAnimal(curr_id);
 
                     if (currentAnimal != null) {
-                        String choice2 = "";
-                        while (!choice2.equals("0")) {
+                        int choice2 = -1;
+                        while (choice2 != 0) {
                             view.showAnimalParams(currentAnimal);
                             view.showAnimalMenu();
-                            choice2 = view.inputParameter("Выберите пункт меню");
+                            choice2 = view.inputNumber("Выберите пункт меню");
 
                             switch (choice2) {
-                                case "1":
-                                    String skill = view.inputParameter("Введите новое умение");
+                                case 1:
+                                    String skill = view.inputString("Введите новое умение");
                                     currentAnimal.addAnimalSkill(skill);
                                     db.updateAnimal(currentAnimal);
                                     break;
-                                case "2":
+                                case 2:
                                     view.showAnimalParams(currentAnimal);
-                                    String id_skill = view.inputParameter("Введите ID умения для удаления");
-                                    try {
-                                        currentAnimal.delAnimalSkill(Integer.parseInt(id_skill) - 1);
-                                        db.updateAnimal(currentAnimal);
-                                        view.showMessage("Умение было удалено.");
-                                    } catch (Exception ignored) {
+                                    int id_skill = view.inputNumber("Введите ID умения для удаления");
 
-                                    }
+                                    currentAnimal.delAnimalSkill(id_skill - 1);
+                                    db.updateAnimal(currentAnimal);
+                                    view.showMessage("Умение было удалено.");
 
                                     break;
                             }

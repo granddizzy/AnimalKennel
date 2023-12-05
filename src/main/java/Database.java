@@ -1,5 +1,6 @@
 import abstractAnimals.Animal;
 import animals.*;
+import logs.Log;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -9,10 +10,13 @@ public class Database implements DatabaseInterface {
 
     private final String DBFilePath;
     private boolean initOk;
+    private final Log log;
 
-    public Database() {
+    public Database(Log log) {
         initOk = false;
         DBFilePath = "./DB.txt";
+        this.log = log;
+
         File file = new File(DBFilePath);
 
         if (!file.exists()) {
@@ -61,8 +65,7 @@ public class Database implements DatabaseInterface {
             fileOut.write(sb.toString().getBytes());
             fileOut.close();
         } catch (IOException e) {
-            System.out.println("Ошибка при чтении или записи файла.");
-            e.printStackTrace();
+            log.append(e.getMessage());
         }
     }
 
@@ -80,8 +83,7 @@ public class Database implements DatabaseInterface {
             }
             reader.close();
         } catch (IOException e) {
-            System.out.println("Ошибка при чтении или записи файла.");
-            e.printStackTrace();
+            log.append(e.getMessage());
         }
 
         return null;
@@ -110,8 +112,7 @@ public class Database implements DatabaseInterface {
             fileOut.write(sb.toString().getBytes());
             fileOut.close();
         } catch (IOException e) {
-            System.out.println("Ошибка при чтении или записи файла.");
-            e.printStackTrace();
+            log.append(e.getMessage());
         }
     }
 
@@ -130,8 +131,8 @@ public class Database implements DatabaseInterface {
                 animalList.add((Animal) animal);
             }
 
-        } catch (IOException ignored) {
-
+        } catch (IOException e) {
+            log.append(e.getMessage());
         }
 
         return animalList;
@@ -160,8 +161,7 @@ public class Database implements DatabaseInterface {
 
             result = lastLine.toString().replace("\n", "");
         } catch (IOException e) {
-            System.out.println("Ошибка при чтении файла.");
-            e.printStackTrace();
+            log.append(e.getMessage());
         }
 
         if (result != null) return Integer.parseInt(result.split(";")[0]);
@@ -181,9 +181,11 @@ public class Database implements DatabaseInterface {
     private Animal createAnimal(String[] animalArray) {
         Animal animal = null;
 
-        int birthday = 0;
-        int birthmonth = 0;
-        int birthyear = 0;
+        String[] birth = animalArray[3].split("\\.", -1);
+
+        int birthday = Integer.parseInt(birth[2]);
+        int birthmonth = Integer.parseInt(birth[1]);
+        int birthyear = Integer.parseInt(birth[0]);
 
         ArrayList<String> skills = new ArrayList<>();
 
@@ -243,11 +245,13 @@ public class Database implements DatabaseInterface {
         // date birthday
         sb.append(animal.getBirthyear()).append(".").append(animal.getBirthmonth()).append(".").append(animal.getBirthday()).append(";");
 
+        // skills
         for (String skill : animal.getSkills()) {
             sb.append(skill).append("|");
         }
-
-        sb.delete(sb.length() - 1, sb.length());
+        if (animal.getSkills().size() > 0) {
+            sb.delete(sb.length() - 1, sb.length());
+        }
 
         sb.append("\n");
 
