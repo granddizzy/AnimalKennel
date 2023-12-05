@@ -36,7 +36,7 @@ public class Shelter {
                     String type = view.selectAnimalType();
                     String name = view.inputString("Введите имя животного");
                     int birthyear = view.inputYear("Введите год рождения животного");
-                    int birthmonth = view.inputMonth("Введите месяц рождения животного");
+                    int birthmonth = view.inputMonth("Введите номер месяца рождения животного (1-12)");
                     int birthday = view.inputDay("Введите день рождения животного");
 
                     if (!checkDate(birthday, birthmonth, birthyear)) {
