@@ -16,4 +16,6 @@ public interface DatabaseInterface {
     ArrayList<Animal> getAnimalsList();
 
     boolean getInitOk();
+
+    void disconnect();
 }
