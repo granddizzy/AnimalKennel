@@ -36,13 +36,20 @@ public class Shelter {
                     int birthmonth = view.inputMonth("Введите месяц рождения животного");
                     int birthday = view.inputDay("Введите день рождения животного");
 
+                    if (!checkDate(birthday, birthmonth, birthyear)) {
+                        view.showMessage("Такой даты не существует.");
+                        break;
+                    }
+
                     Animal animal = createNewAnimal(type, name, birthyear, birthmonth, birthday);
                     db.addAnimal(animal);
                     view.showAnimalList(db.getAnimalsList());
                     break;
                 case 3:
                     view.showAnimalList(db.getAnimalsList());
-                    int id = view.inputNumber("Введите ID животного для удаления");
+                    int id = view.inputNumber("Введите ID животного для удаления (0 - отмена)");
+
+                    if (id == 0) break;
 
                     Animal delAnimal = db.getAnimal(id);
                     if (delAnimal != null) {
@@ -56,7 +63,9 @@ public class Shelter {
                     break;
                 case 4:
                     view.showAnimalList(db.getAnimalsList());
-                    int curr_id = view.inputNumber("Введите ID животного для просмотра данных");
+                    int curr_id = view.inputNumber("Введите ID животного для просмотра данных (0 - отмена)");
+
+                    if (curr_id == 0) break;
 
                     Animal currentAnimal = db.getAnimal(curr_id);
 
@@ -75,7 +84,9 @@ public class Shelter {
                                     break;
                                 case 2:
                                     view.showAnimalParams(currentAnimal);
-                                    int id_skill = view.inputNumber("Введите ID умения для удаления");
+                                    int id_skill = view.inputNumber("Введите ID умения для удаления (0 - отмена)");
+
+                                    if (id_skill == 0) break;
 
                                     currentAnimal.delAnimalSkill(id_skill - 1);
                                     db.updateAnimal(currentAnimal);
@@ -121,5 +132,14 @@ public class Shelter {
         }
 
         return animal;
+    }
+
+    public static String formatDate(int day, int month, int year) {
+
+        return "" + day + "." + month + "." + year;
+    }
+
+    public static boolean checkDate(int day, int month, int year) {
+        return true;
     }
 }

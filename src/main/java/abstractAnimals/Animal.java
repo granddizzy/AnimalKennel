@@ -68,4 +68,9 @@ public abstract class Animal implements AnimalInterface {
     public String getName() {
         return name;
     }
+
+    public static double calcAge(int birthday, int birthmonth, int birthyear) {
+
+        return 0;
+    }
 }

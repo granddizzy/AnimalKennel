@@ -1,5 +1,6 @@
 package animals;
 
+import abstractAnimals.Animal;
 import abstractAnimals.HomeAnimal;
 
 import java.util.ArrayList;
@@ -15,6 +16,11 @@ public class Cat extends HomeAnimal {
 
     @Override
     public String toString() {
-        return "id:" + super.getId() + " Кошка: " + super.getName() + " Дата рождения: "  + this.getBirthday() + "." + this.getBirthmonth() + "." + this.getBirthyear();
+        return "id:" + super.getId() + " Кошка: " + super.getName() + " Возраст: " + Animal.calcAge(super.getBirthday(), super.getBirthmonth(), super.getBirthyear());
+    }
+
+    @Override
+    public String getTypeName() {
+        return "Кошка";
     }
 }

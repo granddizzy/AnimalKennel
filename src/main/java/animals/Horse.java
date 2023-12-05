@@ -1,5 +1,6 @@
 package animals;
 
+import abstractAnimals.Animal;
 import abstractAnimals.PackAnimal;
 
 import java.util.ArrayList;
@@ -16,6 +17,11 @@ public class Horse extends PackAnimal {
 
     @Override
     public String toString() {
-        return "id:" + super.getId() + " Лошадь: " + super.getName() + " Дата рождения: "  + this.getBirthday() + "." + this.getBirthmonth() + "." + this.getBirthyear();
+        return "id:" + super.getId() + " Лошадь: " + super.getName() + " Возраст: "+ Animal.calcAge(super.getBirthday(), super.getBirthmonth(), super.getBirthyear());
+    }
+
+    @Override
+    public String getTypeName() {
+        return "Лошадь";
     }
 }
