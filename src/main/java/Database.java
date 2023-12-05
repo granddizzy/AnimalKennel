@@ -164,7 +164,7 @@ public class Database implements DatabaseInterface {
             log.append(e.getMessage());
         }
 
-        if (result != null) return Integer.parseInt(result.split(";")[0]);
+        if (result != null && !result.equals("")) return Integer.parseInt(result.split(";")[0]);
 
         return 0;
     }

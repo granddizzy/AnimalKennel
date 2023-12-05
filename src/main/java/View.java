@@ -153,16 +153,21 @@ public class View {
 
     void showAnimalParams(Animal animal) {
         System.out.println("Параметры: ");
-        System.out.println(animal);
+        System.out.println("id: " + animal.getId());
+        System.out.println("Животное: " + animal.getTypeName());
+        System.out.println("Имя: " + animal.getName());
+        System.out.println("Дата рождения: " + Shelter.formatDate(animal.getBirthday(), animal.getBirthmonth(), animal.getBirthyear()));
+        System.out.println("Возраст: " + Animal.calcAge(animal.getBirthday(), animal.getBirthmonth(), animal.getBirthyear()));
         System.out.println();
         showSkills(animal);
     }
 
     void showSkills(Animal animal) {
+        System.out.println("Навыки:");
+
         if (animal.getSkills().size() == 0) {
             System.out.println("Навыков еще нет.");
         } else {
-            System.out.println("Навыки:");
             int i = 1;
             for (String skill : animal.getSkills()) {
                 System.out.println("" + i + "." + skill);

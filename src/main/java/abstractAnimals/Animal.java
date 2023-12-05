@@ -2,7 +2,11 @@ package abstractAnimals;
 
 import animals.AnimalInterface;
 
+import java.time.Period;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+
+import java.time.LocalDate;
 
 public abstract class Animal implements AnimalInterface {
 
@@ -67,5 +71,14 @@ public abstract class Animal implements AnimalInterface {
 
     public String getName() {
         return name;
+    }
+
+    public static String calcAge(int birthday, int birthmonth, int birthyear) {
+        LocalDate currentDate = LocalDate.now();
+        LocalDate animalBirthday = LocalDate.of(birthyear, birthmonth, birthday);
+
+        Period age = Period.between(animalBirthday, currentDate);
+
+        return age.getYears() + " г. " + age.getMonths() + " мес. " + age.getDays() + " дн.";
     }
 }
