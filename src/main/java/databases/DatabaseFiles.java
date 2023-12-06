@@ -130,7 +130,7 @@ public class DatabaseFiles extends Database {
 
                 Animal animal = createAnimal(animalArray);
 
-                animalList.add((Animal) animal);
+                animalList.add(animal);
             }
 
         } catch (IOException e) {
