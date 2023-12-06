@@ -8,8 +8,8 @@ public class Main {
         Log log = new Log();
         View view = new View();
 
-        //Database db = new DatabaseFiles(log);
-        Database db = new DatabaseMySQL(log, "Shelter", "root", "ak74sx33", 3306,"localhost");
+        Database db = new DatabaseFiles(log);
+        //Database db = new DatabaseMySQL(log, "Shelter", "root", "ak74sx33", 3306,"localhost");
 
         if (db.getInitOk()) {
             Shelter shelter = new Shelter(view, log, db);
