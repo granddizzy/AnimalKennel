@@ -38,11 +38,15 @@ public class View {
     }
 
     public String inputString(String query) {
-        System.out.print(query + ": ");
-        Scanner scanner = new Scanner(System.in);
-        String str = scanner.nextLine();
-        System.out.println();
-        return str;
+        while (true) {
+            System.out.print(query + ": ");
+            Scanner scanner = new Scanner(System.in);
+            String str = scanner.nextLine();
+            System.out.println();
+            str = str.replace(";", "").replace("|", "");
+
+            if (!str.equals("")) return str;
+        }
     }
 
     public int inputYear(String query) {
@@ -117,12 +121,13 @@ public class View {
     }
 
     public void showAnimalList(ArrayList<Animal> animals) {
-        if (animals.size() == 0) {
+        if (animals == null || animals.size() == 0) {
             System.out.println("В приюте нет ни одного животного.");
+            System.out.println();
         } else {
             System.out.println("Список животных в приюте:");
             for (Animal animal : animals) {
-                System.out.println(animal);
+                if (animal != null) System.out.println(animal);
             }
             System.out.println();
         }

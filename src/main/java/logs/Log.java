@@ -23,6 +23,7 @@ public class Log implements logInterface {
         } else {
             initOk = true;
         }
+        clear();
     }
 
     @Override

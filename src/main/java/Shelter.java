@@ -19,16 +19,16 @@ public class Shelter {
     }
 
     public void start() {
-        if (log.getInitOk()) {
-            log.clear();
-        }
-
         int choice = -1;
         while (choice != 0) {
             view.showMainMenu();
             choice = view.inputNumber("Выберите пункт меню");
 
             switch (choice) {
+                case 0:
+                    db.disconnect();
+                    view.showMessage("До новых встреч!");
+                    break;
                 case 1:
                     view.showAnimalList(db.getAnimalsList());
                     break;
