@@ -36,22 +36,74 @@ public class DatabaseMySQL extends Database {
             statement = myConnect.createStatement();
             statement.executeUpdate("CREATE DATABASE IF NOT EXISTS " + database + ";");
             statement.execute("USE " + database);
-            statement.executeUpdate("""
-                    CREATE TABLE IF NOT EXISTS animals (
-                        id INT AUTO_INCREMENT PRIMARY KEY,
-                        name VARCHAR(50),
-                        birthday DATE
-                    );""");
-            statement.executeUpdate("""
+
+            String sql = "SELECT COUNT(*) AS table_count FROM information_schema.tables WHERE table_schema = '" + database + "' AND table_name = 'animalTypes'";
+            ResultSet resultSet = statement.executeQuery(sql);
+
+            if (resultSet.next()) {
+                int tableCount = resultSet.getInt("table_count");
+                if (tableCount == 0) {
+                    statement.executeUpdate("""
                     CREATE TABLE IF NOT EXISTS animalTypes (
                         id INT AUTO_INCREMENT PRIMARY KEY,
                         type VARCHAR(50)
                     );""");
+
+                    statement.executeUpdate("""
+                    INSERT INTO animalTypes (type) VALUES ('Cобака');
+                    """);
+                    statement.executeUpdate("""
+                    INSERT INTO animalTypes (type) VALUES ('Кот');
+                    """);
+                    statement.executeUpdate("""
+                    INSERT INTO animalTypes (type) VALUES ('Хомяк');
+                    """);
+                    statement.executeUpdate("""
+                    INSERT INTO animalTypes (type) VALUES ('Лошадь');
+                    """);
+                    statement.executeUpdate("""
+                    INSERT INTO animalTypes (type) VALUES ('Осел');
+                    """);
+                    statement.executeUpdate("""
+                    INSERT INTO animalTypes (type) VALUES ('Верблюд');
+                    """);
+                }
+            }
+
             statement.executeUpdate("""
-                    CREATE TABLE IF NOT EXISTS skills (
-                        id INT AUTO_INCREMENT PRIMARY KEY,
-                        skill VARCHAR(100)
+                    CREATE TABLE IF NOT EXISTS animals (
+                        id INT AUTO_INCREMENT PRIMARY KEY,    
+                        animalType INT,             
+                        name VARCHAR(50),
+                        birthday DATE,
+                        skills TEXT,
+                        FOREIGN KEY (animalType) REFERENCES animalTypes(id)
                     );""");
+
+            statement.close();
+
+//            statement.executeUpdate("""
+//                    CREATE TABLE IF NOT EXISTS skills (
+//                        id INT AUTO_INCREMENT PRIMARY KEY,
+//
+//                        skill VARCHAR(100)
+//                    );""");
+
+//            String sql = """
+//                    INSERT INTO animalTypes (type) VALUES (?);
+//                    ;""";
+//
+//            PreparedStatement prStatement = myConnect.prepareStatement(sql);
+//            prStatement.setString(1, "Собака");
+//
+//            // Выполнение SQL запроса
+//            int rowsInserted = prStatement.executeUpdate();
+//            if (rowsInserted > 0) {
+//               log.append("Данные успешно вставлены!");
+//            }
+
+//            prStatement.close();
+
 
         } catch (SQLException e) {
             log.append(e.getMessage());
