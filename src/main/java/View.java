@@ -38,11 +38,15 @@ public class View {
     }
 
     public String inputString(String query) {
-        System.out.print(query + ": ");
-        Scanner scanner = new Scanner(System.in);
-        String str = scanner.nextLine();
-        System.out.println();
-        return str;
+        while (true) {
+            System.out.print(query + ": ");
+            Scanner scanner = new Scanner(System.in);
+            String str = scanner.nextLine();
+            System.out.println();
+            str = str.replace(";", "").replace("|", "");
+
+            if (!str.equals("")) return str;
+        }
     }
 
     public int inputYear(String query) {
