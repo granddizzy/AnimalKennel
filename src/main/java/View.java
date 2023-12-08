@@ -5,7 +5,7 @@ import java.util.Scanner;
 
 import java.time.Year;
 
-public class View {
+public class View implements AutoCloseable {
     public void showMainMenu() {
         System.out.println("Главное меню:");
         System.out.println("0.Выход");
@@ -180,5 +180,10 @@ public class View {
             }
         }
         System.out.println();
+    }
+
+    @Override
+    public void close() {
+
     }
 }

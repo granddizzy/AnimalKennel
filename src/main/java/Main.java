@@ -5,59 +5,68 @@ import logs.Log;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Main {
     public static void main(String[] args) {
-        Log log = new Log();
-        View view = new View();
+        try (View view = new View()) {
+            try (Log log = new Log()) {
+                HashMap<String, String> config = readConfig();
 
-        Database db;
-        if (getConfigParam("dbtype").equals("mysql")) {
+                if (getConfigParam(config,"dbtype").equals("mysql")) {
+                    int mysql_port = 3306;
+                    try {
+                        mysql_port = Integer.parseInt(getConfigParam(config,"mysql_port"));
+                    } catch (NumberFormatException ignored) {
 
-            int mysql_port = 3306;
-            try {
-                mysql_port = Integer.parseInt(getConfigParam("mysql_port"));
-            } catch (NumberFormatException ignored) {
+                    }
 
+                    try (Database db = new DatabaseMySQL("Shelter", getConfigParam(config, "mysql_user"), getConfigParam(config,"mysql_pass"), mysql_port, getConfigParam(config,"mysql_host"))) {
+                        Shelter shelter = new Shelter(view, log, db);
+                        shelter.start();
+                        db.useResource();
+                    } catch (Exception e) {
+                        log.append(e.getMessage());
+                        view.showMessage(e.getMessage());
+                    }
+                } else {
+                    try (Database db = new DatabaseFiles(getConfigParam(config,"file_db_path"))) {
+                        Shelter shelter = new Shelter(view, log, db);
+                        shelter.start();
+                        db.useResource();
+                    } catch (IllegalStateException | IOException e) {
+                        log.append(e.getMessage());
+                        view.showMessage(e.getMessage());
+                    }
+                }
+            } catch (IOException e) {
+                view.showMessage(e.getMessage());
             }
+        } catch (Exception ignored) {
 
-            db = new DatabaseMySQL(log, "Shelter", getConfigParam("mysql_user"), getConfigParam("mysql_pass"), mysql_port, getConfigParam("mysql_host"));
-        } else {
-            db = new DatabaseFiles(log);
-        }
-
-        if (db.getInitOk()) {
-            Shelter shelter = new Shelter(view, log, db);
-            shelter.start();
-        } else {
-            view.showMessage("Ошибка инициализации базы данных!");
         }
     }
 
-    private static ArrayList<String[]> readConfig() {
-        ArrayList<String[]> params = new ArrayList<>();
+    private static HashMap<String, String> readConfig() {
+        HashMap<String, String> config = new HashMap<>();
 
         try (BufferedReader reader = new BufferedReader(new FileReader("config.txt"))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] arrLine = line.replace("\n", "").split("=", -1);
-                params.add(arrLine);
+
+                if (arrLine.length == 2) config.put(arrLine[0], arrLine[1]);
             }
         } catch (IOException ignored) {
-
+            int a = 0;
         }
 
-        return params;
+        return config;
     }
 
-    private static String getConfigParam(String param) {
-        ArrayList<String[]> config = readConfig();
-
-        for (String[] tmpArr : config) {
-            if (tmpArr.length == 2 && tmpArr[0].equals(param)) {
-                return tmpArr[1];
-            }
-        }
+    private static String getConfigParam(HashMap<String, String> config, String params) {
+        String res = config.get(params);
+        if (res != null) return res;
 
         return "";
     }

@@ -2,7 +2,6 @@ package databases;
 
 import abstractAnimals.Animal;
 import animals.*;
-import logs.Log;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -13,27 +12,29 @@ public class DatabaseMySQL extends Database {
     private final String url;
     private final String user;
     private final String password;
-    private final Log log;
     private final String database;
     private Connection myConnect;
 
-    private boolean initOk;
-
-    public DatabaseMySQL(Log log, String database, String user, String password, int port, String host) {
-        this.log = log;
+    public DatabaseMySQL(String database, String user, String password, int port, String host) throws SQLException, ClassNotFoundException {
         this.url = "jdbc:mysql://" + host + ":" + port + "/";
         this.user = user;
         this.password = password;
         this.database = database;
 
-        myConnect = mysqlConnect();
+        try {
+            myConnect = mysqlConnect();
+        } finally {
 
-        if (myConnect != null) initDB();
+        }
 
-        initOk = myConnect != null;
+        try {
+            initDB();
+        } finally {
+
+        }
     }
 
-    private void initDB() {
+    private void initDB() throws SQLException {
         try (Statement statement = myConnect.createStatement()) {
 
             statement.executeUpdate("CREATE DATABASE IF NOT EXISTS " + database + ";");
@@ -82,37 +83,33 @@ public class DatabaseMySQL extends Database {
                         FOREIGN KEY (animalType) REFERENCES animalTypes(id)
                     );""");
 
-        } catch (SQLException e) {
-            log.append(e.getMessage());
         }
     }
 
-    public Connection mysqlConnect() {
+    public Connection mysqlConnect() throws SQLException, ClassNotFoundException {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             return DriverManager.getConnection(this.url, this.user, this.password);
-        } catch (SQLException | ClassNotFoundException e) {
-            log.append(e.getMessage());
+        } finally {
+
         }
-        return null;
     }
 
-    @Override
     public void disconnect() {
         try {
             myConnect.close();
-        } catch (SQLException e) {
-            log.append(e.getMessage());
+        } catch (SQLException ignored) {
+
         }
     }
 
     @Override
-    public void addAnimal(Animal animal) {
+    public void addAnimal(Animal animal) throws SQLException {
         String sql = ("""
-                    INSERT INTO animals
-                    (animalType, name, birthday)
-                    VALUES (?, ?, ?);
-                    """);
+                INSERT INTO animals
+                (animalType, name, birthday)
+                VALUES (?, ?, ?);
+                """);
 
         try (PreparedStatement statement = myConnect.prepareStatement(sql)) {
             statement.setInt(1, getAnimalTypeID(getAnimalType(animal)));
@@ -123,21 +120,19 @@ public class DatabaseMySQL extends Database {
 
             int rows = statement.executeUpdate();
             if (rows == 0) {
-                log.append("Данные не добавлены!");
+                throw new SQLException("Data not added");
             }
-        } catch (SQLException e) {
-            log.append(e.getMessage());
         }
     }
 
     private int getAnimalTypeID(String typeName) {
         String sql = ("""
-                    SELECT id
-                    FROM animalTypes
-                    WHERE type = ?;
-                    """);
+                SELECT id
+                FROM animalTypes
+                WHERE type = ?;
+                """);
 
-        try (PreparedStatement statement = myConnect.prepareStatement(sql)){
+        try (PreparedStatement statement = myConnect.prepareStatement(sql)) {
             statement.setString(1, typeName);
             ResultSet set = statement.executeQuery();
 
@@ -145,41 +140,39 @@ public class DatabaseMySQL extends Database {
                 return set.getInt("id");
             }
         } catch (SQLException e) {
-            log.append(e.getMessage());
+            //log.append(e.getMessage());
         }
 
         return 0;
     }
 
     @Override
-    public void delAnimal(int id) {
+    public void delAnimal(int id) throws SQLException {
         String sql = ("""
-                    DELETE 
-                    FROM animals
-                    WHERE id = ?;
-                    """);
+                DELETE 
+                FROM animals
+                WHERE id = ?;
+                """);
 
         try (PreparedStatement statement = myConnect.prepareStatement(sql)) {
             statement.setInt(1, id);
 
             int rows = statement.executeUpdate();
             if (rows == 0) {
-                log.append("Данные не удалены!");
+                throw new SQLException("The data has not been deleted");
             }
-        } catch (SQLException e) {
-            log.append(e.getMessage());
         }
     }
 
     @Override
-    public Animal getAnimal(int id) {
+    public Animal getAnimal(int id) throws SQLException {
         String sql = ("""
-                    SELECT *
-                    FROM animals
-                    LEFT JOIN animalTypes
-                    ON animals.animalType = animalTypes.id
-                    WHERE animals.id = ?;
-                    """);
+                SELECT *
+                FROM animals
+                LEFT JOIN animalTypes
+                ON animals.animalType = animalTypes.id
+                WHERE animals.id = ?;
+                """);
 
         try (PreparedStatement statement = myConnect.prepareStatement(sql)) {
             statement.setInt(1, id);
@@ -194,8 +187,6 @@ public class DatabaseMySQL extends Database {
 
                 return createAnimal(animalId, name, skills, birth, type);
             }
-        } catch (SQLException e) {
-            log.append(e.getMessage());
         }
 
         return null;
@@ -238,15 +229,15 @@ public class DatabaseMySQL extends Database {
     }
 
     @Override
-    public void updateAnimal(Animal animal) {
+    public void updateAnimal(Animal animal) throws SQLException {
         String sql = ("""
-                    UPDATE animals
-                    SET
-                    name = ?,
-                    birthday = ?,
-                    skills = ?
-                    WHERE id = ?;
-                    """);
+                UPDATE animals
+                SET
+                name = ?,
+                birthday = ?,
+                skills = ?
+                WHERE id = ?;
+                """);
 
         try (PreparedStatement statement = myConnect.prepareStatement(sql)) {
             statement.setString(1, animal.getName());
@@ -268,23 +259,21 @@ public class DatabaseMySQL extends Database {
 
             int rows = statement.executeUpdate();
             if (rows == 0) {
-                log.append("Данные не обновлены!");
+                throw new SQLException("Data not updated");
             }
-        } catch (SQLException e) {
-            log.append(e.getMessage());
         }
     }
 
     @Override
-    public ArrayList<Animal> getAnimalsList() {
+    public ArrayList<Animal> getAnimalsList() throws SQLException {
         ArrayList<Animal> animalList = new ArrayList<>();
 
         String sql = ("""
-                    SELECT *
-                    FROM animals
-                    LEFT JOIN animalTypes
-                    ON animals.animalType = animalTypes.id;
-                    """);
+                SELECT *
+                FROM animals
+                LEFT JOIN animalTypes
+                ON animals.animalType = animalTypes.id;
+                """);
 
         try (PreparedStatement statement = myConnect.prepareStatement(sql)) {
             ResultSet set = statement.executeQuery();
@@ -298,16 +287,9 @@ public class DatabaseMySQL extends Database {
 
                 animalList.add(createAnimal(animalId, name, skills, birth, type));
             }
-        } catch (SQLException e) {
-            log.append(e.getMessage());
         }
 
         return animalList;
-    }
-
-    @Override
-    public boolean getInitOk() {
-        return initOk;
     }
 
     private String getAnimalType(Animal animal) {
@@ -326,5 +308,11 @@ public class DatabaseMySQL extends Database {
         }
 
         return null;
+    }
+
+    @Override
+    public void close() throws IllegalStateException {
+        disconnect();
+        super.close();
     }
 }

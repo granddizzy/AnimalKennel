@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 import java.time.LocalDate;
 
-public abstract class Animal implements AnimalInterface {
+public abstract class Animal implements AnimalInterface{
 
     private final int birthday;
     private final int birthmonth;

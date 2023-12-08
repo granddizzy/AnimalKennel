@@ -7,7 +7,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 
-public class Shelter {
+public class Shelter implements ShelterInterface {
     private final View view;
     private Log log;
     private final Database db;
@@ -26,11 +26,10 @@ public class Shelter {
 
             switch (choice) {
                 case 0:
-                    db.disconnect();
                     view.showMessage("До новых встреч!");
                     break;
                 case 1:
-                    view.showAnimalList(db.getAnimalsList());
+                    view.showAnimalList(getAnimals());
                     break;
                 case 2:
                     String type = view.selectAnimalType();
@@ -44,34 +43,34 @@ public class Shelter {
                         break;
                     }
 
-                    Animal animal = createNewAnimal(type, name, birthyear, birthmonth, birthday);
-                    db.addAnimal(animal);
-                    view.showAnimalList(db.getAnimalsList());
+                    addAnimal(createNewAnimal(type, name, birthyear, birthmonth, birthday));
+                    view.showAnimalList(getAnimals());
                     break;
                 case 3:
-                    view.showAnimalList(db.getAnimalsList());
+                    view.showAnimalList(getAnimals());
+
                     int id = view.inputNumber("Введите ID животного для удаления (0 - отмена)");
 
                     if (id == 0) break;
 
-                    Animal delAnimal = db.getAnimal(id);
+                    Animal delAnimal = getAnimal(id);
+
                     if (delAnimal != null) {
-                        db.delAnimal(id);
+                        delAnimal(id);
                         view.showMessage("Удалено животное - " + delAnimal);
-                        view.showAnimalList(db.getAnimalsList());
+                        view.showAnimalList(getAnimals());
                     } else {
                         view.showMessage("Не найдено животное с ID:" + id);
                     }
 
                     break;
                 case 4:
-                    view.showAnimalList(db.getAnimalsList());
-                    int curr_id = view.inputNumber("Введите ID животного для просмотра данных (0 - отмена)");
+                    view.showAnimalList(getAnimals());
 
+                    int curr_id = view.inputNumber("Введите ID животного для просмотра данных (0 - отмена)");
                     if (curr_id == 0) break;
 
-                    Animal currentAnimal = db.getAnimal(curr_id);
-
+                    Animal currentAnimal = getAnimal(curr_id);
                     if (currentAnimal != null) {
                         int choice2 = -1;
                         while (choice2 != 0) {
@@ -83,7 +82,7 @@ public class Shelter {
                                 case 1:
                                     String skill = view.inputString("Введите новое умение");
                                     currentAnimal.addAnimalSkill(skill);
-                                    db.updateAnimal(currentAnimal);
+                                    updateAnimal(currentAnimal);
                                     break;
                                 case 2:
                                     view.showAnimalParams(currentAnimal);
@@ -92,7 +91,13 @@ public class Shelter {
                                     if (id_skill == 0) break;
 
                                     currentAnimal.delAnimalSkill(id_skill - 1);
-                                    db.updateAnimal(currentAnimal);
+
+                                    try {
+                                        db.updateAnimal(currentAnimal);
+                                    } catch (Exception e) {
+                                        log.append(e.getMessage());
+                                    }
+
                                     view.showMessage("Умение было удалено.");
 
                                     break;
@@ -107,7 +112,56 @@ public class Shelter {
     }
 
     public ArrayList<Animal> getAnimals() {
-        return db.getAnimalsList();
+        try {
+            return db.getAnimalsList();
+        } catch (Exception e) {
+            log.append(e.getMessage());
+            view.showMessage(e.getMessage());
+        }
+
+        return new ArrayList<>();
+    }
+
+    @Override
+    public void addAnimal(Animal animal) {
+        try {
+            db.addAnimal(animal);
+        } catch (Exception e) {
+            log.append(e.getMessage());
+            view.showMessage(e.getMessage());
+        }
+    }
+
+    @Override
+    public void delAnimal(int id) {
+        try {
+            db.delAnimal(id);
+        } catch (Exception e) {
+            log.append(e.getMessage());
+            view.showMessage(e.getMessage());
+        }
+    }
+
+    @Override
+    public Animal getAnimal(int id) {
+        Animal animal = null;
+        try {
+            animal = db.getAnimal(id);
+        } catch (Exception e) {
+            log.append(e.getMessage());
+            view.showMessage(e.getMessage());
+        }
+        return animal;
+    }
+
+    @Override
+    public void updateAnimal(Animal animal) {
+        try {
+            db.updateAnimal(animal);
+        } catch (Exception e) {
+            log.append(e.getMessage());
+            view.showMessage(e.getMessage());
+        }
     }
 
     private Animal createNewAnimal(String type, String name, int birthyear, int birthmonth, int birthday) {

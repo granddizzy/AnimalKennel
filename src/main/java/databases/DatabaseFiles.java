@@ -2,52 +2,42 @@ package databases;
 
 import abstractAnimals.Animal;
 import animals.*;
-import logs.Log;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 public class DatabaseFiles extends Database {
-
     private final String DBFilePath;
-    private boolean initOk;
-    private final Log log;
 
-    public DatabaseFiles(Log log) {
-        initOk = false;
-        DBFilePath = "./DB.txt";
-        this.log = log;
+    public DatabaseFiles(String path) throws IOException {
+        if (path.equals("")) throw new IOException("The path to the database file is not specified in config.txt");
 
+        DBFilePath = path;
         File file = new File(DBFilePath);
 
         if (!file.exists()) {
             try {
                 boolean res = file.createNewFile();
-                initOk = true;
             } catch (IOException ignored) {
-
+                throw new IOException("Could not create a database file!");
             }
-        } else {
-            initOk = true;
         }
     }
 
     @Override
-    public void addAnimal(Animal animal) {
+    public void addAnimal(Animal animal) throws IOException {
         int lastId = getLastID();
         lastId++;
         animal.setId(lastId);
 
         try (FileWriter fw = new FileWriter(DBFilePath, true)) {
             fw.write(createDBLine(animal));
-        } catch (IOException e) {
-            log.append(e.getMessage());
         }
     }
 
     @Override
-    public void delAnimal(int id) {
+    public void delAnimal(int id) throws IOException {
         StringBuilder sb = new StringBuilder();
 
         try (BufferedReader reader = new BufferedReader(new FileReader(DBFilePath))) {
@@ -60,20 +50,15 @@ public class DatabaseFiles extends Database {
                     sb.append(System.lineSeparator());
                 }
             }
-
-        } catch (IOException e) {
-            log.append(e.getMessage());
         }
 
         try (FileOutputStream fileOut = new FileOutputStream(DBFilePath)) {
             fileOut.write(sb.toString().getBytes());
-        } catch (IOException e) {
-            log.append(e.getMessage());
         }
     }
 
     @Override
-    public Animal getAnimal(int id) {
+    public Animal getAnimal(int id) throws IOException {
         try (BufferedReader reader = new BufferedReader(new FileReader(DBFilePath))) {
             String line;
             while ((line = reader.readLine()) != null) {
@@ -82,15 +67,13 @@ public class DatabaseFiles extends Database {
                     return createAnimal(arrLine);
                 }
             }
-        } catch (IOException e) {
-            log.append(e.getMessage());
         }
 
         return null;
     }
 
     @Override
-    public void updateAnimal(Animal animal) {
+    public void updateAnimal(Animal animal) throws IOException {
         StringBuilder sb = new StringBuilder();
 
         try (BufferedReader reader = new BufferedReader(new FileReader(DBFilePath))) {
@@ -104,39 +87,31 @@ public class DatabaseFiles extends Database {
                     sb.append(createDBLine(animal));
                 }
             }
-        } catch (IOException e) {
-            log.append(e.getMessage());
         }
 
         try (FileOutputStream fileOut = new FileOutputStream(DBFilePath)) {
             fileOut.write(sb.toString().getBytes());
-        } catch (IOException e) {
-            log.append(e.getMessage());
         }
     }
 
     @Override
-    public ArrayList<Animal> getAnimalsList() {
+    public ArrayList<Animal> getAnimalsList() throws IOException {
         ArrayList<Animal> animalList = new ArrayList<>();
 
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(DBFilePath))) {
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 String[] animalArray = parseDatabaseLine(line.replace("\n", ""));
-
                 Animal animal = createAnimal(animalArray);
-
                 animalList.add(animal);
             }
-        } catch (IOException e) {
-            log.append(e.getMessage());
         }
 
         return animalList;
     }
 
-    public Integer getLastID() {
-        String result = null;
+    public Integer getLastID() throws IOException {
+        String result;
 
         try (RandomAccessFile file = new RandomAccessFile(DBFilePath, "r")) {
             long fileLength = file.length();
@@ -157,23 +132,11 @@ public class DatabaseFiles extends Database {
             }
 
             result = lastLine.toString().replace("\n", "");
-        } catch (IOException e) {
-            log.append(e.getMessage());
         }
 
-        if (result != null && !result.equals("")) return Integer.parseInt(result.split(";")[0]);
+        if (!result.equals("")) return Integer.parseInt(result.split(";")[0]);
 
         return 0;
-    }
-
-    @Override
-    public boolean getInitOk() {
-        return initOk;
-    }
-
-    @Override
-    public void disconnect() {
-
     }
 
     private String[] parseDatabaseLine(String line) {

@@ -4,25 +4,21 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class Log implements logInterface {
-    private boolean initOk;
+public class Log implements logInterface, AutoCloseable {
     private final String LogFilePath;
 
-    public Log() {
-        initOk = false;
+    public Log() throws IOException {
         LogFilePath = "./log.txt";
         File file = new File(LogFilePath);
 
         if (!file.exists()) {
             try {
                 boolean res = file.createNewFile();
-                initOk = true;
-            } catch (IOException ignored) {
+            } finally {
 
             }
-        } else {
-            initOk = true;
         }
+
         clear();
     }
 
@@ -45,7 +41,7 @@ public class Log implements logInterface {
     }
 
     @Override
-    public boolean getInitOk() {
-        return initOk;
+    public void close() throws IOException {
+
     }
 }
