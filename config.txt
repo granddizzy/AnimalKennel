@@ -1,0 +1,7 @@
+# dbtype - mysql/files
+dbtype=files
+
+mysql_user=root
+mysql_pass=ak74sx33
+mysql_host=localhost
+mysql_port=3306

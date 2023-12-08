@@ -34,9 +34,8 @@ public class DatabaseMySQL extends Database {
     }
 
     private void initDB() {
-        Statement statement;
-        try {
-            statement = myConnect.createStatement();
+        try (Statement statement = myConnect.createStatement()) {
+
             statement.executeUpdate("CREATE DATABASE IF NOT EXISTS " + database + ";");
             statement.execute("USE " + database);
 
@@ -83,7 +82,6 @@ public class DatabaseMySQL extends Database {
                         FOREIGN KEY (animalType) REFERENCES animalTypes(id)
                     );""");
 
-            statement.close();
         } catch (SQLException e) {
             log.append(e.getMessage());
         }
@@ -110,14 +108,13 @@ public class DatabaseMySQL extends Database {
 
     @Override
     public void addAnimal(Animal animal) {
-        try {
-            String sql = ("""
+        String sql = ("""
                     INSERT INTO animals
                     (animalType, name, birthday)
                     VALUES (?, ?, ?);
                     """);
 
-            PreparedStatement statement = myConnect.prepareStatement(sql);
+        try (PreparedStatement statement = myConnect.prepareStatement(sql)) {
             statement.setInt(1, getAnimalTypeID(getAnimalType(animal)));
             statement.setString(2, animal.getName());
 
@@ -134,14 +131,13 @@ public class DatabaseMySQL extends Database {
     }
 
     private int getAnimalTypeID(String typeName) {
-        try {
-            String sql = ("""
+        String sql = ("""
                     SELECT id
                     FROM animalTypes
                     WHERE type = ?;
                     """);
 
-            PreparedStatement statement = myConnect.prepareStatement(sql);
+        try (PreparedStatement statement = myConnect.prepareStatement(sql)){
             statement.setString(1, typeName);
             ResultSet set = statement.executeQuery();
 
@@ -157,14 +153,13 @@ public class DatabaseMySQL extends Database {
 
     @Override
     public void delAnimal(int id) {
-        try {
-            String sql = ("""
+        String sql = ("""
                     DELETE 
                     FROM animals
                     WHERE id = ?;
                     """);
 
-            PreparedStatement statement = myConnect.prepareStatement(sql);
+        try (PreparedStatement statement = myConnect.prepareStatement(sql)) {
             statement.setInt(1, id);
 
             int rows = statement.executeUpdate();
@@ -178,8 +173,7 @@ public class DatabaseMySQL extends Database {
 
     @Override
     public Animal getAnimal(int id) {
-        try {
-            String sql = ("""
+        String sql = ("""
                     SELECT *
                     FROM animals
                     LEFT JOIN animalTypes
@@ -187,7 +181,7 @@ public class DatabaseMySQL extends Database {
                     WHERE animals.id = ?;
                     """);
 
-            PreparedStatement statement = myConnect.prepareStatement(sql);
+        try (PreparedStatement statement = myConnect.prepareStatement(sql)) {
             statement.setInt(1, id);
             ResultSet set = statement.executeQuery();
 
@@ -245,8 +239,7 @@ public class DatabaseMySQL extends Database {
 
     @Override
     public void updateAnimal(Animal animal) {
-        try {
-            String sql = ("""
+        String sql = ("""
                     UPDATE animals
                     SET
                     name = ?,
@@ -255,7 +248,7 @@ public class DatabaseMySQL extends Database {
                     WHERE id = ?;
                     """);
 
-            PreparedStatement statement = myConnect.prepareStatement(sql);
+        try (PreparedStatement statement = myConnect.prepareStatement(sql)) {
             statement.setString(1, animal.getName());
 
             Date date = Date.valueOf(animal.getBirthyear() + "-" + animal.getBirthmonth() + "-" + animal.getBirthday());
@@ -286,15 +279,14 @@ public class DatabaseMySQL extends Database {
     public ArrayList<Animal> getAnimalsList() {
         ArrayList<Animal> animalList = new ArrayList<>();
 
-        try {
-            String sql = ("""
+        String sql = ("""
                     SELECT *
                     FROM animals
                     LEFT JOIN animalTypes
                     ON animals.animalType = animalTypes.id;
                     """);
 
-            PreparedStatement statement = myConnect.prepareStatement(sql);
+        try (PreparedStatement statement = myConnect.prepareStatement(sql)) {
             ResultSet set = statement.executeQuery();
 
             while (set.next()) {

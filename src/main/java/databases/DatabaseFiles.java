@@ -41,17 +41,16 @@ public class DatabaseFiles extends Database {
 
         try (FileWriter fw = new FileWriter(DBFilePath, true)) {
             fw.write(createDBLine(animal));
-        } catch (IOException ignored) {
-
+        } catch (IOException e) {
+            log.append(e.getMessage());
         }
     }
 
     @Override
     public void delAnimal(int id) {
-        try {
-            File file = new File(DBFilePath);
-            BufferedReader reader = new BufferedReader(new FileReader(file));
-            StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(DBFilePath))) {
             String line;
 
             while ((line = reader.readLine()) != null) {
@@ -61,11 +60,13 @@ public class DatabaseFiles extends Database {
                     sb.append(System.lineSeparator());
                 }
             }
-            reader.close();
 
-            FileOutputStream fileOut = new FileOutputStream(file);
+        } catch (IOException e) {
+            log.append(e.getMessage());
+        }
+
+        try (FileOutputStream fileOut = new FileOutputStream(DBFilePath)) {
             fileOut.write(sb.toString().getBytes());
-            fileOut.close();
         } catch (IOException e) {
             log.append(e.getMessage());
         }
@@ -73,9 +74,7 @@ public class DatabaseFiles extends Database {
 
     @Override
     public Animal getAnimal(int id) {
-        try {
-            File file = new File(DBFilePath);
-            BufferedReader reader = new BufferedReader(new FileReader(file));
+        try (BufferedReader reader = new BufferedReader(new FileReader(DBFilePath))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] arrLine = line.replace("\n", "").split(";", -1);
@@ -83,7 +82,6 @@ public class DatabaseFiles extends Database {
                     return createAnimal(arrLine);
                 }
             }
-            reader.close();
         } catch (IOException e) {
             log.append(e.getMessage());
         }
@@ -93,12 +91,10 @@ public class DatabaseFiles extends Database {
 
     @Override
     public void updateAnimal(Animal animal) {
-        try {
-            File file = new File(DBFilePath);
-            BufferedReader reader = new BufferedReader(new FileReader(file));
-            StringBuilder sb = new StringBuilder();
-            String line;
+        StringBuilder sb = new StringBuilder();
 
+        try (BufferedReader reader = new BufferedReader(new FileReader(DBFilePath))) {
+            String line;
             while ((line = reader.readLine()) != null) {
                 String[] arrLine = line.split(";");
                 if (Integer.parseInt(arrLine[0]) != animal.getId()) {
@@ -108,11 +104,12 @@ public class DatabaseFiles extends Database {
                     sb.append(createDBLine(animal));
                 }
             }
-            reader.close();
+        } catch (IOException e) {
+            log.append(e.getMessage());
+        }
 
-            FileOutputStream fileOut = new FileOutputStream(file);
+        try (FileOutputStream fileOut = new FileOutputStream(DBFilePath)) {
             fileOut.write(sb.toString().getBytes());
-            fileOut.close();
         } catch (IOException e) {
             log.append(e.getMessage());
         }
@@ -124,7 +121,6 @@ public class DatabaseFiles extends Database {
 
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(DBFilePath))) {
             String line;
-
             while ((line = bufferedReader.readLine()) != null) {
                 String[] animalArray = parseDatabaseLine(line.replace("\n", ""));
 
@@ -132,7 +128,6 @@ public class DatabaseFiles extends Database {
 
                 animalList.add(animal);
             }
-
         } catch (IOException e) {
             log.append(e.getMessage());
         }
@@ -188,7 +183,7 @@ public class DatabaseFiles extends Database {
     private Animal createAnimal(String[] animalArray) {
         Animal animal = null;
 
-        String[] birth = animalArray[3].split("\\.", -1);
+        String[] birth = animalArray[3].split("-", -1);
 
         int birthday = Integer.parseInt(birth[2]);
         int birthmonth = Integer.parseInt(birth[1]);
@@ -250,7 +245,7 @@ public class DatabaseFiles extends Database {
         sb.append(animal.getName()).append(";");
 
         // date birthday
-        sb.append(animal.getBirthyear()).append(".").append(animal.getBirthmonth()).append(".").append(animal.getBirthday()).append(";");
+        sb.append(animal.getBirthyear()).append("-").append(animal.getBirthmonth()).append("-").append(animal.getBirthday()).append(";");
 
         // skills
         for (String skill : animal.getSkills()) {
