@@ -125,7 +125,7 @@ public class DatabaseMySQL extends Database {
         }
     }
 
-    private int getAnimalTypeID(String typeName) {
+    private int getAnimalTypeID(String typeName) throws SQLException {
         String sql = ("""
                 SELECT id
                 FROM animalTypes
@@ -139,11 +139,9 @@ public class DatabaseMySQL extends Database {
             while (set.next()) {
                 return set.getInt("id");
             }
-        } catch (SQLException e) {
-            //log.append(e.getMessage());
         }
 
-        return 0;
+        throw new SQLException("Did not find the type of animal in the database table");
     }
 
     @Override
