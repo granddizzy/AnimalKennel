@@ -1,11 +1,10 @@
 package databases;
 
 import abstractAnimals.Animal;
-import animals.*;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 
 public class DatabaseFiles extends Database {
     private final String DBFilePath;
@@ -58,13 +57,21 @@ public class DatabaseFiles extends Database {
     }
 
     @Override
-    public Animal getAnimal(int id) throws IOException {
+    public HashMap<String, String> getAnimal(int id) throws IOException {
+        HashMap<String, String> animal = new HashMap<>();
+
         try (BufferedReader reader = new BufferedReader(new FileReader(DBFilePath))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] arrLine = line.replace("\n", "").split(";", -1);
                 if (Integer.parseInt(arrLine[0]) == id) {
-                    return createAnimal(arrLine);
+                    animal.put("id", arrLine[0]);
+                    animal.put("name", arrLine[2]);
+                    animal.put("skills", arrLine[4]);
+                    animal.put("birthday", arrLine[3]);
+                    animal.put("type", arrLine[1]);
+
+                    return animal;
                 }
             }
         }
@@ -95,14 +102,21 @@ public class DatabaseFiles extends Database {
     }
 
     @Override
-    public ArrayList<Animal> getAnimalsList() throws IOException {
-        ArrayList<Animal> animalList = new ArrayList<>();
+    public ArrayList<HashMap<String, String>> getAnimalsList() throws IOException {
+        ArrayList<HashMap<String, String>> animalList = new ArrayList<>();
 
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(DBFilePath))) {
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 String[] animalArray = parseDatabaseLine(line.replace("\n", ""));
-                Animal animal = createAnimal(animalArray);
+
+                HashMap<String, String> animal = new HashMap<>();
+                animal.put("id", animalArray[0]);
+                animal.put("name", animalArray[2]);
+                animal.put("skills", animalArray[4]);
+                animal.put("birthday", animalArray[3]);
+                animal.put("type", animalArray[1]);
+
                 animalList.add(animal);
             }
         }
@@ -143,46 +157,6 @@ public class DatabaseFiles extends Database {
         return line.split(";", -1);
     }
 
-    private Animal createAnimal(String[] animalArray) {
-        Animal animal = null;
-
-        String[] birth = animalArray[3].split("-", -1);
-
-        int birthday = Integer.parseInt(birth[2]);
-        int birthmonth = Integer.parseInt(birth[1]);
-        int birthyear = Integer.parseInt(birth[0]);
-
-        ArrayList<String> skills = new ArrayList<>();
-
-        if (!animalArray[4].equals("")) {
-            String[] arrSkills = animalArray[4].split("\\|", -1);
-            skills = new ArrayList<>(Arrays.asList(arrSkills));
-        }
-
-        switch (animalArray[1]) {
-            case "Dog" -> {
-                animal = new Dog(Integer.parseInt(animalArray[0]), animalArray[2], birthday, birthmonth, birthyear, skills);
-            }
-            case "Cat" -> {
-                animal = new Cat(Integer.parseInt(animalArray[0]), animalArray[2], birthday, birthmonth, birthyear, skills);
-            }
-            case "Hamster" -> {
-                animal = new Hamster(Integer.parseInt(animalArray[0]), animalArray[2], birthday, birthmonth, birthyear, skills);
-            }
-            case "Camel" -> {
-                animal = new Camel(Integer.parseInt(animalArray[0]), animalArray[2], birthday, birthmonth, birthyear, skills);
-            }
-            case "Horse" -> {
-                animal = new Horse(Integer.parseInt(animalArray[0]), animalArray[2], birthday, birthmonth, birthyear, skills);
-            }
-            case "Donkey" -> {
-                animal = new Donkey(Integer.parseInt(animalArray[0]), animalArray[2], birthday, birthmonth, birthyear, skills);
-            }
-        }
-
-        return animal;
-    }
-
     private String createDBLine(Animal animal) {
         StringBuilder sb = new StringBuilder();
 
@@ -190,19 +164,7 @@ public class DatabaseFiles extends Database {
         sb.append(animal.getId()).append(";");
 
         // type
-        if (animal instanceof Dog) {
-            sb.append("Dog").append(";");
-        } else if (animal instanceof Cat) {
-            sb.append("Cat").append(";");
-        } else if (animal instanceof Hamster) {
-            sb.append("Hamster").append(";");
-        } else if (animal instanceof Horse) {
-            sb.append("Horse").append(";");
-        } else if (animal instanceof Camel) {
-            sb.append("Camel").append(";");
-        } else if (animal instanceof Donkey) {
-            sb.append("Donkey").append(";");
-        }
+        sb.append(animal.getClassName()).append(";");
 
         // name
         sb.append(animal.getName()).append(";");

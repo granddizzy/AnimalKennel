@@ -15,12 +15,12 @@ public class Donkey extends PackAnimal {
     }
 
     @Override
-    public String toString() {
-        return "id:" + super.getId() + " Осел: " + super.getName() + " Возраст: " + Animal.calcAge(super.getBirthday(), super.getBirthmonth(), super.getBirthyear());
+    public String getClassName() {
+        return "Donkey";
     }
 
     @Override
-    public String getTypeName() {
-        return "Осел";
+    public String getType() {
+        return "Pack";
     }
 }

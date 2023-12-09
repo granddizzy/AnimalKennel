@@ -16,12 +16,12 @@ public class Horse extends PackAnimal {
     }
 
     @Override
-    public String toString() {
-        return "id:" + super.getId() + " Лошадь: " + super.getName() + " Возраст: "+ Animal.calcAge(super.getBirthday(), super.getBirthmonth(), super.getBirthyear());
+    public String getClassName() {
+        return "Horse";
     }
 
     @Override
-    public String getTypeName() {
-        return "Лошадь";
+    public String getType() {
+        return "Pack";
     }
 }

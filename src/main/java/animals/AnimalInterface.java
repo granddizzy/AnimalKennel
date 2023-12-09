@@ -6,5 +6,7 @@ public interface AnimalInterface {
 
     void delAnimalSkill(int index);
 
-    String getTypeName();
+    String getClassName();
+
+    String getType();
 }

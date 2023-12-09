@@ -81,4 +81,9 @@ public abstract class Animal implements AnimalInterface{
 
         return age.getYears() + " г. " + age.getMonths() + " мес. " + age.getDays() + " дн.";
     }
+
+    @Override
+    public String toString() {
+        return "id:" + getId() + " " + getClassName() + ": " + getName() + " Age: " + Animal.calcAge(getBirthday(), getBirthmonth(), getBirthyear());
+    }
 }

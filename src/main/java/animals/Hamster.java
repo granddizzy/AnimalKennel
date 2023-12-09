@@ -15,12 +15,12 @@ public class Hamster extends HomeAnimal {
     }
 
     @Override
-    public String toString() {
-        return "id:" + super.getId() + " Хомяк: " + super.getName() + " Возраст: " + Animal.calcAge(super.getBirthday(), super.getBirthmonth(), super.getBirthyear());
+    public String getClassName() {
+        return "Hamster";
     }
 
     @Override
-    public String getTypeName() {
-        return "Хомяк";
+    public String getType() {
+        return "Home";
     }
 }

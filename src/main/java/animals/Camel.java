@@ -15,13 +15,13 @@ public class Camel extends PackAnimal {
     }
 
     @Override
-    public String toString() {
-        return "id:" + super.getId() + " Верблюд: " + super.getName() + "Возраст: " + Animal.calcAge(super.getBirthday(), super.getBirthmonth(), super.getBirthyear());
+    public String getClassName() {
+        return "Camel";
     }
 
     @Override
-    public String getTypeName() {
-        return "Верблюд";
+    public String getType() {
+        return "Pack";
     }
 }
 

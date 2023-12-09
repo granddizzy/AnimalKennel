@@ -5,6 +5,7 @@ import logs.Log;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class Main {
@@ -26,8 +27,8 @@ public class Main {
                         shelter.start();
                         db.useResource();
                     } catch (Exception e) {
-                        log.append(e.getMessage());
-                        view.showMessage(e.getMessage());
+                        log.append(e.getMessage() + "\n" + Arrays.toString(e.getStackTrace()));
+                        view.showMessage(e.getMessage() + "\n" + Arrays.toString(e.getStackTrace()));
                     }
                 } else {
                     try (Database db = new DatabaseFiles(getConfigParam(config,"file_db_path"))) {
@@ -35,8 +36,8 @@ public class Main {
                         shelter.start();
                         db.useResource();
                     } catch (IllegalStateException | IOException e) {
-                        log.append(e.getMessage());
-                        view.showMessage(e.getMessage());
+                        log.append(e.getMessage() + "\n" + Arrays.toString(e.getStackTrace()));
+                        view.showMessage(e.getMessage() + "\n" + Arrays.toString(e.getStackTrace()));
                     }
                 }
             } catch (IOException e) {

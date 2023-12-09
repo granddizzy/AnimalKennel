@@ -6,6 +6,8 @@ import logs.Log;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 
 public class Shelter implements ShelterInterface {
     private final View view;
@@ -22,34 +24,34 @@ public class Shelter implements ShelterInterface {
         int choice = -1;
         while (choice != 0) {
             view.showMainMenu();
-            choice = view.inputNumber("Выберите пункт меню");
+            choice = view.inputMenuNumber();
 
             switch (choice) {
                 case 0:
-                    view.showMessage("До новых встреч!");
+                    view.showGoodBye();
                     break;
                 case 1:
                     view.showAnimalList(getAnimals());
                     break;
                 case 2:
-                    String type = view.selectAnimalType();
-                    String name = view.inputString("Введите имя животного");
-                    int birthyear = view.inputYear("Введите год рождения животного");
-                    int birthmonth = view.inputMonth("Введите номер месяца рождения животного (1-12)");
-                    int birthday = view.inputDay("Введите день рождения животного");
+                    String className = getAnimalClasses()[view.selectAnimalClassId(getAnimalClasses()) - 1];
+                    String name = view.inputName();
+                    int birthyear = view.inputBirthyear();
+                    int birthmonth = view.inputBirthmonth();
+                    int birthday = view.inputBirthday();
 
                     if (!checkDate(birthday, birthmonth, birthyear)) {
-                        view.showMessage("Такой даты не существует.");
+                        view.showDateError();
                         break;
                     }
 
-                    addAnimal(createNewAnimal(type, name, birthyear, birthmonth, birthday));
+                    addAnimal(createNewAnimal(className, name, birthyear, birthmonth, birthday));
                     view.showAnimalList(getAnimals());
                     break;
                 case 3:
                     view.showAnimalList(getAnimals());
 
-                    int id = view.inputNumber("Введите ID животного для удаления (0 - отмена)");
+                    int id = view.inputAnimalIDforDelete();
 
                     if (id == 0) break;
 
@@ -57,17 +59,16 @@ public class Shelter implements ShelterInterface {
 
                     if (delAnimal != null) {
                         delAnimal(id);
-                        view.showMessage("Удалено животное - " + delAnimal);
                         view.showAnimalList(getAnimals());
                     } else {
-                        view.showMessage("Не найдено животное с ID:" + id);
+                        view.showIdError(id);
                     }
 
                     break;
                 case 4:
                     view.showAnimalList(getAnimals());
 
-                    int curr_id = view.inputNumber("Введите ID животного для просмотра данных (0 - отмена)");
+                    int curr_id = view.inputAnimalID();
                     if (curr_id == 0) break;
 
                     Animal currentAnimal = getAnimal(curr_id);
@@ -76,17 +77,16 @@ public class Shelter implements ShelterInterface {
                         while (choice2 != 0) {
                             view.showAnimalParams(currentAnimal);
                             view.showAnimalMenu();
-                            choice2 = view.inputNumber("Выберите пункт меню");
+                            choice2 = view.inputMenuNumber();
 
                             switch (choice2) {
                                 case 1:
-                                    String skill = view.inputString("Введите новое умение");
-                                    currentAnimal.addAnimalSkill(skill);
+                                    currentAnimal.addAnimalSkill(view.inputNewSkill());
                                     updateAnimal(currentAnimal);
                                     break;
                                 case 2:
                                     view.showAnimalParams(currentAnimal);
-                                    int id_skill = view.inputNumber("Введите ID умения для удаления (0 - отмена)");
+                                    int id_skill = view.inputSkillIDforDelete();
 
                                     if (id_skill == 0) break;
 
@@ -98,13 +98,11 @@ public class Shelter implements ShelterInterface {
                                         log.append(e.getMessage());
                                     }
 
-                                    view.showMessage("Умение было удалено.");
-
                                     break;
                             }
                         }
                     } else {
-                        view.showMessage("Не найдено животное с ID:" + curr_id);
+                        view.showIdError(curr_id);
                     }
                     break;
             }
@@ -112,14 +110,21 @@ public class Shelter implements ShelterInterface {
     }
 
     public ArrayList<Animal> getAnimals() {
+        ArrayList<HashMap<String, String>> animalList = new ArrayList<>();
+        ArrayList<Animal> animals = new ArrayList<>();
+
         try {
-            return db.getAnimalsList();
+            animalList =  db.getAnimalsList();
         } catch (Exception e) {
             log.append(e.getMessage());
             view.showMessage(e.getMessage());
         }
 
-        return new ArrayList<>();
+        for (HashMap<String, String> animalHashMap: animalList) {
+            animals.add(createAnimal(animalHashMap));
+        }
+
+        return animals;
     }
 
     @Override
@@ -144,13 +149,15 @@ public class Shelter implements ShelterInterface {
 
     @Override
     public Animal getAnimal(int id) {
-        Animal animal = null;
+        HashMap<String, String> animalHashMap = null;
         try {
-            animal = db.getAnimal(id);
+            animalHashMap = db.getAnimal(id);
         } catch (Exception e) {
             log.append(e.getMessage());
             view.showMessage(e.getMessage());
         }
+
+        Animal animal = createAnimal(animalHashMap);
         return animal;
     }
 
@@ -164,10 +171,10 @@ public class Shelter implements ShelterInterface {
         }
     }
 
-    private Animal createNewAnimal(String type, String name, int birthyear, int birthmonth, int birthday) {
+    private Animal createNewAnimal(String className, String name, int birthyear, int birthmonth, int birthday) {
         Animal animal = null;
 
-        switch (type) {
+        switch (className) {
             case "Dog" -> {
                 animal = new Dog(name, birthday, birthmonth, birthyear);
             }
@@ -185,6 +192,46 @@ public class Shelter implements ShelterInterface {
             }
             case "Donkey" -> {
                 animal = new Donkey(name, birthday, birthmonth, birthyear);
+            }
+        }
+
+        return animal;
+    }
+
+    private Animal createAnimal(HashMap<String, String> animalHashMap) {
+        Animal animal = null;
+
+        String[] birth = animalHashMap.get("birthday").split("-", -1);
+
+        int birthday = Integer.parseInt(birth[2]);
+        int birthmonth = Integer.parseInt(birth[1]);
+        int birthyear = Integer.parseInt(birth[0]);
+
+        ArrayList<String> skills = new ArrayList<>();
+
+        if (animalHashMap.get("skills") != null && !animalHashMap.get("skills").equals("")) {
+            String[] arrSkills = animalHashMap.get("skills").split("\\|", -1);
+            skills = new ArrayList<>(Arrays.asList(arrSkills));
+        }
+
+        switch (animalHashMap.get("type")) {
+            case "Dog" -> {
+                animal = new Dog(Integer.parseInt(animalHashMap.get("id")), animalHashMap.get("name"), birthday, birthmonth, birthyear, skills);
+            }
+            case "Cat" -> {
+                animal = new Cat(Integer.parseInt(animalHashMap.get("id")), animalHashMap.get("name"), birthday, birthmonth, birthyear, skills);
+            }
+            case "Hamster" -> {
+                animal = new Hamster(Integer.parseInt(animalHashMap.get("id")), animalHashMap.get("name"), birthday, birthmonth, birthyear, skills);
+            }
+            case "Camel" -> {
+                animal = new Camel(Integer.parseInt(animalHashMap.get("id")), animalHashMap.get("name"), birthday, birthmonth, birthyear, skills);
+            }
+            case "Horse" -> {
+                animal = new Horse(Integer.parseInt(animalHashMap.get("id")), animalHashMap.get("name"), birthday, birthmonth, birthyear, skills);
+            }
+            case "Donkey" -> {
+                animal = new Donkey(Integer.parseInt(animalHashMap.get("id")), animalHashMap.get("name"), birthday, birthmonth, birthyear, skills);
             }
         }
 
@@ -213,5 +260,18 @@ public class Shelter implements ShelterInterface {
         }
 
         return true;
+    }
+
+    private String[] getAnimalClasses() {
+        String[] animalTypes = new String[6];
+
+        animalTypes[0] = "Cat";
+        animalTypes[1] = "Dog";
+        animalTypes[2] = "Hamster";
+        animalTypes[3] = "Horse";
+        animalTypes[4] = "Donkey";
+        animalTypes[5] = "Camel";
+
+        return animalTypes;
     }
 }

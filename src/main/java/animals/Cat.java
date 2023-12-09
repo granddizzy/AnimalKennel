@@ -15,12 +15,12 @@ public class Cat extends HomeAnimal {
     }
 
     @Override
-    public String toString() {
-        return "id:" + super.getId() + " Кошка: " + super.getName() + " Возраст: " + Animal.calcAge(super.getBirthday(), super.getBirthmonth(), super.getBirthyear());
+    public String getClassName() {
+        return "Cat";
     }
 
     @Override
-    public String getTypeName() {
-        return "Кошка";
+    public String getType() {
+        return "Home";
     }
 }
