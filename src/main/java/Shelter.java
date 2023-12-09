@@ -201,6 +201,8 @@ public class Shelter implements ShelterInterface {
     private Animal createAnimal(HashMap<String, String> animalHashMap) {
         Animal animal = null;
 
+        if (animalHashMap == null) return animal;
+
         String[] birth = animalHashMap.get("birthday").split("-", -1);
 
         int birthday = Integer.parseInt(birth[2]);
