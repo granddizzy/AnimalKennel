@@ -3,7 +3,6 @@ package abstractAnimals;
 import animals.AnimalInterface;
 
 import java.time.Period;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 
 import java.time.LocalDate;

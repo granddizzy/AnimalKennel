@@ -2,7 +2,7 @@
 dbtype=
 
 mysql_user=root
-mysql_pass=ak74sx33
+mysql_pass=
 mysql_host=localhost
 mysql_port=3306
 

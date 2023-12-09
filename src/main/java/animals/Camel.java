@@ -1,6 +1,5 @@
 package animals;
 
-import abstractAnimals.Animal;
 import abstractAnimals.PackAnimal;
 
 import java.util.ArrayList;
