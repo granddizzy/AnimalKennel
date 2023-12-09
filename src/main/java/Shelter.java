@@ -85,10 +85,14 @@ public class Shelter implements ShelterInterface {
                                     updateAnimal(currentAnimal);
                                     break;
                                 case 2:
+                                    if (currentAnimal.getSkills().size() == 0) break;
+
                                     view.showAnimalParams(currentAnimal);
                                     int id_skill = view.inputSkillIDforDelete();
 
                                     if (id_skill == 0) break;
+
+                                    if (id_skill < 0 || id_skill > currentAnimal.getSkills().size()) break;
 
                                     currentAnimal.delAnimalSkill(id_skill - 1);
 
