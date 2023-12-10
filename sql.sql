@@ -86,37 +86,31 @@ CREATE TABLE camels (
 	FOREIGN KEY (type) REFERENCES pack_animals(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-# dogs
 INSERT INTO dogs (name, birthday, skills, type) VALUES
 ('Бейли','2023-01-01','Сидеть', 1),
 ('Макс','2023-02-01','Лежать', 1),
 ('Луна','2023-03-01','Фас', 1);
 
-# cats
 INSERT INTO cats (name, birthday, skills, type) VALUES
 ('Вася','2023-01-01','Мурлыкать', 2),
 ('Мурка','2023-01-01','Ловить мышей', 2),
 ('Симба','2023-01-01','Играть', 2);
 
-# hamsters
 INSERT INTO hamsters (name, birthday, skills, type) VALUES
 ('Карамелька','2022-02-01','Подъем на задние лапы', 3),
 ('Шнюфель','2023-03-01','Бег в колесе', 3),
 ('Пушистик','2023-04-01','', 3);
 
-# horses
 INSERT INTO horses (name, birthday, skills, type) VALUES
 ('Торнадо','2020-01-01','Шаг', 1),
 ('Рыжик','2020-01-01','Галоп', 1),
 ('Пегас','2020-01-01','', 1);
 
-# donkeys
 INSERT INTO donkeys (name, birthday, skills, type) VALUES
 ('Булат','2020-05-15','', 2),
 ('Потап','2020-06-16','', 2),
 ('Граф','2020-06-17','', 2);
 
-# camels
 INSERT INTO camels (name, birthday, skills, type) VALUES
 ('Хаджар','2019-07-20','Кусается', 3),
 ('Касим','2019-08-21','Плюется', 3),
@@ -137,7 +131,7 @@ SELECT * FROM camels;
 
 # to combine horses and donkeys
 SELECT name, birthday, skills FROM horses
-UNION
+UNION ALL
 SELECT name, birthday, skills FROM donkeys;
 
 # young_animals
@@ -145,18 +139,18 @@ CREATE TABLE young_animals AS
 WITH
 all_animals AS
 (SELECT id, name, birthday, skills, 'Dog' as class FROM dogs
-UNION
+UNION ALL
 SELECT id, name, birthday, skills, 'Cat' AS class FROM cats
-UNION
+UNION ALL
 SELECT id, name, birthday, skills, 'Hamster' AS class FROM hamsters
-UNION
+UNION ALL
 SELECT id, name, birthday, skills, 'Horse' AS class FROM horses
-UNION
+UNION ALL
 SELECT id, name, birthday, skills, 'Donkey' AS class FROM donkeys
-UNION
+UNION ALL
 SELECT id, name, birthday, skills, 'Camel' AS class FROM camels)
 SELECT
-	id,
+  id,
   class,
   name,
   birthday,
@@ -176,23 +170,23 @@ p_t AS
 SELECT dogs.name, dogs.birthday, dogs.skills, h_t.class, h_t.type
 FROM dogs
 LEFT JOIN h_t ON dogs.type=h_t.id
-UNION
+UNION ALL
 SELECT cats.name, cats.birthday, cats.skills, h_t.class, h_t.type
 FROM cats
 LEFT JOIN h_t ON cats.type=h_t.id
-UNION
+UNION ALL
 SELECT hamsters.name, hamsters.birthday, hamsters.skills, h_t.class, h_t.type
 FROM hamsters
 LEFT JOIN h_t ON hamsters.type=h_t.id
-UNION
+UNION ALL
 SELECT horses.name, horses.birthday, horses.skills, p_t.class, p_t.type
 FROM horses
 LEFT JOIN p_t ON horses.type=p_t.id
-UNION
+UNION ALL
 SELECT donkeys.name, donkeys.birthday, donkeys.skills, p_t.class, p_t.type
 FROM donkeys
 LEFT JOIN p_t ON donkeys.type=p_t.id
-UNION
+UNION ALL
 SELECT camels.name, camels.birthday, camels.skills, p_t.class, p_t.type
 FROM camels
 LEFT JOIN p_t ON camels.type=p_t.id;
